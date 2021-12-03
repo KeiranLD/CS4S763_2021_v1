@@ -16,6 +16,37 @@ router.get('/', (req, res, next) => {
         })
 });
 
+router.get('/userreviews', (req, res, next) => {
+    Review.find()
+        .select('username email star comments location')
+        .populate('username', 'email')
+        .exec()
+        .then(account => {
+            res.status(200).json({
+                count: account.length,
+                account: account.map(account => {
+                    return {
+                        _id: account._id,
+                        username: account.username,
+                        email: account.email,
+                        star: account.star,
+                        comments: account.comments,
+                        location: account.location
+                    }
+                }),
+                request: {
+                    type: 'GET'
+                }
+            })
+        })
+        .catch(error => {
+            console.log(error);
+            res.status(500).json({
+                error: error
+            })
+        });
+});
+
 router.post('/', (req, res, next) => {
     const review = new Review({
         _id: new mongoose.Types.ObjectId(),
